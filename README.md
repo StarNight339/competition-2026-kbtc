@@ -8,6 +8,7 @@
 | [`backend/`](backend) | Node.js, Express, MySQL, JWT, bcryptjs, multer | REST API + ระบบ login / สิทธิ์ |
 | [`frontend/`](frontend) | Nuxt 4, Vue 3, Chart.js | หน้าเว็บ login, ตั้งค่าบัญชี, จัดการผู้ใช้ |
 | [`network/`](network) | MikroTik hAP lite, Cisco CBS350 | VLAN, DHCP, NAT, Firewall |
+| [`lab/`](lab) | GNS3, MikroTik CHR, Packet Tracer | คู่มือแล็บจำลองสำหรับซ้อม |
 
 ---
 
