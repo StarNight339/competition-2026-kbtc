@@ -30,6 +30,8 @@ cd frontend && npm install && npm run dev
 
 ## ปัญหาที่รู้อยู่ในเวอร์ชันนี้ (แก้แล้วใน `main`)
 
+รายละเอียดเต็มพร้อมตำแหน่งในโค้ดและวิธีแก้อยู่ที่ [`bug-check.md`](bug-check.md)
+
 - ติดตั้ง `bcryptjs` แต่โค้ด `require('bcrypt')` → server เริ่มไม่ได้จนกว่าจะ `npm install bcrypt`
 - ข้อมูลตัวอย่างใน DB ไม่ได้ hash รหัสผ่าน → login บัญชีตัวอย่างไม่ได้
 - response ส่ง `u_password` กลับไปด้วย
