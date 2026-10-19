@@ -1,0 +1,54 @@
+# รันทั้งระบบบน Production Server (VM2) ด้วยคำสั่งเดียว
+#   cp .env.example .env   (แล้วแก้ค่า)
+#   docker compose up -d --build
+#   docker compose exec backend npm run seed      # สร้างผู้ใช้ตัวอย่าง (ครั้งแรก)
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: db-kbtcweb
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${DB_PASSWORD}"]
+      interval: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT_SERVER: 5000
+      JWT_KEY: ${JWT_KEY}
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: db-kbtcweb
+      CORS_ORIGIN: http://${SERVER_IP}:3000
+      SEED_PASSWORD: ${SEED_PASSWORD}
+    volumes:
+      - uploads:/app/uploads
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on: [backend]
+    environment:
+      # เบราว์เซอร์ของผู้ใช้เป็นคนเรียก API จึงต้องเป็น IP ของ Server ที่เข้าถึงได้จากเครือข่าย
+      NUXT_PUBLIC_API_BASE: http://${SERVER_IP}:5000/api
+      NUXT_PUBLIC_FILE_BASE: http://${SERVER_IP}:5000
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data:
+  uploads:

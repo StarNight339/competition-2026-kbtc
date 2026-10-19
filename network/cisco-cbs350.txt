@@ -1,0 +1,79 @@
+! =====================================================================
+!  Cisco CBS350-8T-E-2G — VLAN + Trunk  (KBTC Competition 2026)
+!
+!  GE1-2 = VLAN100 (access)    GE3-4 = VLAN200 (access)
+!  GE8   = Trunk ไป MikroTik ether4 (100,200 tagged / VLAN1 untagged)
+!  Management IP ของสวิตช์ = 10.1.1.254 (VLAN1)  gateway = 10.1.1.1
+!
+!  ค่าเริ่มต้น: 192.168.1.254  user admin / pass cisco
+!  วิธีใช้: เข้าผ่าน console หรือ SSH แล้ววางทีละช่วง
+!  (หรือทำในหน้าเว็บตามขั้นตอนท้ายไฟล์ ผลลัพธ์เหมือนกัน)
+! =====================================================================
+
+configure terminal
+
+! ---- 1) สร้าง VLAN ----
+vlan database
+ vlan 100,200
+exit
+interface vlan 100
+ name Vlan100
+exit
+interface vlan 200
+ name Vlan200
+exit
+
+! ---- 2) Access port ----
+interface range GE1-2
+ switchport mode access
+ switchport access vlan 100
+exit
+interface range GE3-4
+ switchport mode access
+ switchport access vlan 200
+exit
+
+! ---- 3) Trunk port ไป MikroTik ----
+interface GE8
+ switchport mode trunk
+ switchport trunk allowed vlan add 100,200
+ switchport trunk native vlan 1
+exit
+
+! ---- 4) Management IP (ให้จัดการได้จากทุก VLAN ผ่าน router) ----
+interface vlan 1
+ no ip address dhcp
+ ip address 10.1.1.254 255.255.255.0
+exit
+ip default-gateway 10.1.1.1
+
+! ---- 5) DHCP Snooping (ถ้าโจทย์ต้องการ) ----
+! ต้องตั้ง GE8 เป็น trusted ไม่งั้น DHCP จาก MikroTik จะถูกบล็อก
+ip dhcp snooping
+ip dhcp snooping vlan 100
+ip dhcp snooping vlan 200
+interface GE8
+ ip dhcp snooping trust
+exit
+
+! ---- 6) เปลี่ยนรหัสผ่าน admin ----
+username admin password ChangeMe@2026 privilege 15
+
+end
+write memory
+
+! ---- ตรวจสอบ ----
+! show vlan
+! show interfaces switchport GE8
+! show ip interface
+
+! =====================================================================
+!  ทำผ่านหน้าเว็บ (เมนู VLAN Management)
+!  1. VLAN Settings  : + เพิ่ม VLAN ID 100, 200
+!  2. Interface Settings : GE8 = Trunk, GE1-4 = Access
+!  3. Port to VLAN   : Filter VLAN 100 > Go > GE1,GE2 = Untagged, GE8 = Tagged > Apply
+!                      Filter VLAN 200 > Go > GE3,GE4 = Untagged, GE8 = Tagged > Apply
+!  4. Port VLAN Membership : ตรวจว่า GE1-2 = 100U, GE3-4 = 200U, GE8 = 1U,100T,200T
+!  5. IP Configuration > IPv4 Interface : VLAN1 = 10.1.1.254/24, Default Gateway 10.1.1.1
+!  6. กด Save (ไอคอนด้านบน) ไม่งั้นรีบูตแล้วค่าหาย
+! =====================================================================
