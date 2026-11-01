@@ -35,6 +35,7 @@ docker compose up -d --build
 ```
 
 - Frontend: http://localhost:3000 · API: http://localhost:5000/api
+- phpMyAdmin: http://localhost:8080 (user `root` รหัสผ่านเว้นว่าง)
 - MySQL import `backend/database/db-kbtcweb.sql` ให้อัตโนมัติตอนรันครั้งแรก (ล้างข้อมูลด้วย `docker compose down -v`)
 - ไม่ได้แก้โค้ดตามสไลด์: ทุก container ใช้ network เดียวกับ `db` (`network_mode: service:db`) จึงต่อ `127.0.0.1` ได้เหมือนรันเครื่องเดียว
 - image ของ backend ติดตั้ง `bcrypt` เพิ่มให้ เพื่อเลี่ยง crash จากบั๊ก B1 ส่วนบั๊กอื่นยังอยู่ครบ (เช่น login บัญชีตัวอย่างไม่ได้ตาม B6)
