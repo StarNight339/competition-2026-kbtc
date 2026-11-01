@@ -42,5 +42,19 @@ services:
     network_mode: service:db
     depends_on: [backend]
 
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+    volumes:
+      # อนุญาตให้ login root แบบไม่มีรหัสผ่าน (ค่าเริ่มต้นของ phpMyAdmin ไม่ยอม)
+      - ./docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    ports:
+      - "8080:80"     # http://localhost:8080  user: root  password: (เว้นว่าง)
+
 volumes:
   db-data:
