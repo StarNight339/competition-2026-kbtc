@@ -28,6 +28,17 @@ cd backend && npm install && cp .env.example .env && npm run dev
 cd frontend && npm install && npm run dev
 ```
 
+### รันด้วย Docker
+
+```bash
+docker compose up -d --build
+```
+
+- Frontend: http://localhost:3000 · API: http://localhost:5000/api
+- MySQL import `backend/database/db-kbtcweb.sql` ให้อัตโนมัติตอนรันครั้งแรก (ล้างข้อมูลด้วย `docker compose down -v`)
+- ไม่ได้แก้โค้ดตามสไลด์: ทุก container ใช้ network เดียวกับ `db` (`network_mode: service:db`) จึงต่อ `127.0.0.1` ได้เหมือนรันเครื่องเดียว
+- image ของ backend ติดตั้ง `bcrypt` เพิ่มให้ เพื่อเลี่ยง crash จากบั๊ก B1 ส่วนบั๊กอื่นยังอยู่ครบ (เช่น login บัญชีตัวอย่างไม่ได้ตาม B6)
+
 ## ปัญหาที่รู้อยู่ในเวอร์ชันนี้ (แก้แล้วใน `main`)
 
 รายละเอียดเต็มพร้อมตำแหน่งในโค้ดและวิธีแก้อยู่ที่ [`bug-check.md`](bug-check.md)

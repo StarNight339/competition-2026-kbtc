@@ -1,0 +1,46 @@
+# รันเวอร์ชันเก่าด้วย Docker โดยไม่แก้โค้ดตามสไลด์
+#   docker compose up -d --build
+#   เปิด http://localhost:3000  (API อยู่ที่ http://localhost:5000/api)
+#
+# โค้ดเดิมเขียนตายตัวไว้ว่า DB อยู่ที่ 127.0.0.1 (root, ไม่มีรหัสผ่าน) และ apiBase เป็น 127.0.0.1:5000
+# จึงให้ backend และ frontend ใช้ network เดียวกับ db (network_mode: service:db)
+# ทุก container เห็น 127.0.0.1 เป็นเครื่องเดียวกัน เหมือนรันบนเครื่องเดียวตามสไลด์
+# ด้วยเหตุนี้ port ทั้งหมดต้องประกาศไว้ที่ service db
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"   # ตรงกับ config/db.js (password: '')
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./backend/database/db-kbtcweb.sql:/docker-entrypoint-initdb.d/01-db-kbtcweb.sql:ro
+    ports:
+      - "3000:3000"   # frontend
+      - "5000:5000"   # backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    network_mode: service:db
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # ค่าเดียวกับ backend/.env.example
+      PORT_SERVER: 5000
+      JWT_KEY: kbtc@1234
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    network_mode: service:db
+    depends_on: [backend]
+
+volumes:
+  db-data:
