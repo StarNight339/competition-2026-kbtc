@@ -1,8 +1,5 @@
 # KBTC Competition 2026
-
-ระบบจัดการผู้ใช้งานแบบแบ่งสิทธิ์ (Admin / Staff / User) สำหรับงานแข่งขัน
-ประกอบด้วย 3 ส่วน:
-
+ 
 | โฟลเดอร์ | เทคโนโลยี | หน้าที่ |
 |---|---|---|
 | [`backend/`](backend) | Node.js, Express, MySQL, JWT, bcryptjs, multer | REST API + ระบบ login / สิทธิ์ |
@@ -100,6 +97,19 @@ docker compose up -d --build
 docker compose exec backend npm run seed
 ```
 เปิด `http://<SERVER_IP>:3000`
+
+| Service | URL |
+|---|---|
+| Frontend | `http://<SERVER_IP>:3000` |
+| Backend API | `http://<SERVER_IP>:5000/api` |
+| phpMyAdmin | `http://<SERVER_IP>:8080` |
+
+### phpMyAdmin
+ใช้จัดการฐานข้อมูล `db-kbtcweb` ที่รันอยู่ใน container `db`
+- Username: `root`
+- Password: ค่า `DB_PASSWORD` ใน `.env`
+
+ถ้าไม่อยากให้เครื่องอื่นในเครือข่ายเข้า phpMyAdmin ได้ ให้แก้ port ใน `docker-compose.yml` เป็น `"127.0.0.1:8080:80"`
 
 ## โครงสร้าง
 
