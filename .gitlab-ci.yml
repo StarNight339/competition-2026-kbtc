@@ -1,0 +1,20 @@
+stages:
+  - test
+  - build
+
+test-job:
+  stage: test
+  tags:
+    - docker # ต้องตรงกับ Tags ของ Runner
+  script:
+    - echo "Hello from GitLab Runner!"
+    - docker info # ทดสอบว่าเรียกใช้ Docker ได้ไหม
+
+build-job:
+  stage: build
+  tags:
+    - docker
+  image: docker:24.0.5
+  script:
+    - echo "Building Docker Image..."
+    # ใส่คำสั่ง build จริงที่นี่
